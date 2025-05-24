@@ -15,14 +15,14 @@ interface GradeEntryProps {
 
 const GradeEntry = ({ students, courses, onSubmit }: GradeEntryProps) => {
   const [selectedCourse, setSelectedCourse] = useState("");
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState("all");
   const [gradeType, setGradeType] = useState("");
   const [coefficient, setCoefficient] = useState("1");
   const [comment, setComment] = useState("");
   const [studentGrades, setStudentGrades] = useState<Record<string, string>>({});
 
   const filteredStudents = students.filter(student => 
-    selectedClass === "" || student.class === selectedClass
+    selectedClass === "all" || student.class === selectedClass
   );
 
   const handleGradeChange = (studentId: string, grade: string) => {
@@ -82,7 +82,7 @@ const GradeEntry = ({ students, courses, onSubmit }: GradeEntryProps) => {
                 <SelectValue placeholder="Sélectionner une classe" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les classes</SelectItem>
+                <SelectItem value="all">Toutes les classes</SelectItem>
                 <SelectItem value="Terminale S">Terminale S</SelectItem>
                 <SelectItem value="Première S">Première S</SelectItem>
                 <SelectItem value="Seconde A">Seconde A</SelectItem>
