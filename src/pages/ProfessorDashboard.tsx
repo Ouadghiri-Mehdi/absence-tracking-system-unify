@@ -5,6 +5,7 @@ import DashboardCard from "@/components/DashboardCard";
 import AttendanceTable, { AttendanceRecord } from "@/components/AttendanceTable";
 import GradesTable, { GradeRecord } from "@/components/GradesTable";
 import GradeEntry from "@/components/GradeEntry";
+import CourseSchedule, { CourseSession } from "@/components/CourseSchedule";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,6 +20,7 @@ const ProfessorDashboard = () => {
 
   const sidebarItems = [
     { title: "Tableau de bord", href: "/professor?tab=dashboard" },
+    { title: "Mon planning", href: "/professor?tab=schedule" },
     { title: "Prise d'absences", href: "/professor?tab=record" },
     { title: "Saisie des notes", href: "/professor?tab=grades" },
     { title: "Historique", href: "/professor?tab=history" },
@@ -61,6 +63,16 @@ const ProfessorDashboard = () => {
     { id: "3", name: "Géométrie" }
   ];
 
+  // Planning des cours pour le professeur
+  const professorSchedule: CourseSession[] = [
+    { id: "1", course: "Mathématiques", professor: "Prof. Dupont", class: "Terminale S", day: "Lundi", startTime: "08:00", endTime: "10:00", room: "Salle 101", duration: 2 },
+    { id: "2", course: "Algèbre", professor: "Prof. Dupont", class: "Première S", day: "Mardi", startTime: "14:00", endTime: "16:00", room: "Salle 102", duration: 2 },
+    { id: "3", course: "Géométrie", professor: "Prof. Dupont", class: "Seconde A", day: "Lundi", startTime: "08:00", endTime: "10:00", room: "Salle 103", duration: 2 },
+    { id: "4", course: "Mathématiques", professor: "Prof. Dupont", class: "Terminale S", day: "Mercredi", startTime: "10:00", endTime: "12:00", room: "Salle 101", duration: 2 },
+    { id: "5", course: "Algèbre", professor: "Prof. Dupont", class: "Première S", day: "Jeudi", startTime: "14:00", endTime: "16:00", room: "Salle 102", duration: 2 },
+    { id: "6", course: "Géométrie", professor: "Prof. Dupont", class: "Seconde A", day: "Vendredi", startTime: "08:00", endTime: "10:00", room: "Salle 103", duration: 2 },
+  ];
+
   const handleGradeSubmit = (gradesData: any[]) => {
     console.log("Nouvelles notes:", gradesData);
     // Ici on ajouterait la logique pour sauvegarder les notes
@@ -86,6 +98,7 @@ const ProfessorDashboard = () => {
             <div className="flex justify-between items-center">
               <TabsList>
                 <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
+                <TabsTrigger value="schedule">Mon planning</TabsTrigger>
                 <TabsTrigger value="record">Prise d'absences</TabsTrigger>
                 <TabsTrigger value="grades">Saisie des notes</TabsTrigger>
                 <TabsTrigger value="history">Historique</TabsTrigger>
@@ -152,6 +165,17 @@ const ProfessorDashboard = () => {
               <div className="mt-6">
                 <h2 className="text-xl font-bold mb-4">Dernières absences enregistrées</h2>
                 <AttendanceTable data={attendanceData.slice(0, 5)} userRole="professor" />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="schedule" className="space-y-4">
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold">Mon planning de cours</h2>
+                <CourseSchedule 
+                  sessions={professorSchedule} 
+                  userRole="professor"
+                  professorName="Prof. Dupont"
+                />
               </div>
             </TabsContent>
             

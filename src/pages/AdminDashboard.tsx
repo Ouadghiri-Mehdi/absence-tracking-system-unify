@@ -4,6 +4,8 @@ import Sidebar from "@/components/Sidebar";
 import DashboardCard from "@/components/DashboardCard";
 import AttendanceTable, { AttendanceRecord } from "@/components/AttendanceTable";
 import GradesTable, { GradeRecord } from "@/components/GradesTable";
+import CourseSchedule, { CourseSession } from "@/components/CourseSchedule";
+import ScheduleManagement from "@/components/ScheduleManagement";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,6 +20,7 @@ const AdminDashboard = () => {
     { title: "Tableau de bord", href: "/admin?tab=dashboard" },
     { title: "Gestion des absences", href: "/admin?tab=absences" },
     { title: "Gestion des notes", href: "/admin?tab=grades" },
+    { title: "Planning des cours", href: "/admin?tab=schedule" },
     { title: "Rapports", href: "/admin?tab=reports" },
     { title: "Paramètres", href: "/admin?tab=settings" },
   ];
@@ -60,6 +63,36 @@ const AdminDashboard = () => {
     // Logique de suppression
   };
 
+  // Données fictives pour le planning
+  const [scheduleSessions, setScheduleSessions] = useState<CourseSession[]>([
+    { id: "1", course: "Mathématiques", professor: "Prof. Dupont", class: "Terminale S", day: "Lundi", startTime: "08:00", endTime: "10:00", room: "Salle 101", duration: 2 },
+    { id: "2", course: "Français", professor: "Prof. Martin", class: "Première L", day: "Lundi", startTime: "10:15", endTime: "12:15", room: "Salle 102", duration: 2 },
+    { id: "3", course: "Histoire", professor: "Prof. Leroy", class: "Seconde A", day: "Mardi", startTime: "14:00", endTime: "16:00", room: "Salle 103", duration: 2 },
+    { id: "4", course: "Anglais", professor: "Prof. Smith", class: "Première ES", day: "Mercredi", startTime: "09:00", endTime: "11:00", room: "Salle 201", duration: 2 },
+    { id: "5", course: "SVT", professor: "Prof. Dubois", class: "Terminale S", day: "Jeudi", startTime: "08:00", endTime: "11:00", room: "Laboratoire 1", duration: 3 },
+  ]);
+
+  const handleAddSession = (sessionData: Omit<CourseSession, 'id'>) => {
+    const newSession: CourseSession = {
+      ...sessionData,
+      id: Date.now().toString()
+    };
+    setScheduleSessions(prev => [...prev, newSession]);
+    console.log("Nouveau cours ajouté:", newSession);
+  };
+
+  const handleEditSession = (session: CourseSession) => {
+    setScheduleSessions(prev => 
+      prev.map(s => s.id === session.id ? session : s)
+    );
+    console.log("Cours modifié:", session);
+  };
+
+  const handleDeleteSession = (sessionId: string) => {
+    setScheduleSessions(prev => prev.filter(s => s.id !== sessionId));
+    console.log("Cours supprimé:", sessionId);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header userRole="admin" userName="Admin Principal" />
@@ -72,6 +105,7 @@ const AdminDashboard = () => {
                 <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
                 <TabsTrigger value="absences">Gestion des absences</TabsTrigger>
                 <TabsTrigger value="grades">Gestion des notes</TabsTrigger>
+                <TabsTrigger value="schedule">Planning des cours</TabsTrigger>
                 <TabsTrigger value="reports">Rapports</TabsTrigger>
                 <TabsTrigger value="settings">Paramètres</TabsTrigger>
               </TabsList>
@@ -199,6 +233,34 @@ const AdminDashboard = () => {
                 onEditGrade={handleEditGrade}
                 onDeleteGrade={handleDeleteGrade}
               />
+            </TabsContent>
+            
+            <TabsContent value="schedule" className="space-y-4">
+              <Tabs defaultValue="management" className="space-y-4">
+                <TabsList>
+                  <TabsTrigger value="management">Gestion</TabsTrigger>
+                  <TabsTrigger value="view">Vue planning</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="management">
+                  <ScheduleManagement
+                    sessions={scheduleSessions}
+                    onAddSession={handleAddSession}
+                    onEditSession={handleEditSession}
+                    onDeleteSession={handleDeleteSession}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="view">
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold">Planning général des cours</h2>
+                    <CourseSchedule 
+                      sessions={scheduleSessions} 
+                      userRole="admin"
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
             </TabsContent>
             
             <TabsContent value="reports" className="space-y-4">
