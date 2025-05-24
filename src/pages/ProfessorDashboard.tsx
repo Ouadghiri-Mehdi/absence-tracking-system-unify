@@ -1,9 +1,10 @@
-
 import { useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import DashboardCard from "@/components/DashboardCard";
 import AttendanceTable, { AttendanceRecord } from "@/components/AttendanceTable";
+import GradesTable, { GradeRecord } from "@/components/GradesTable";
+import GradeEntry from "@/components/GradeEntry";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,6 +20,7 @@ const ProfessorDashboard = () => {
   const sidebarItems = [
     { title: "Tableau de bord", href: "/professor?tab=dashboard" },
     { title: "Prise d'absences", href: "/professor?tab=record" },
+    { title: "Saisie des notes", href: "/professor?tab=grades" },
     { title: "Historique", href: "/professor?tab=history" },
     { title: "Mes cours", href: "/professor?tab=courses" },
   ];
@@ -45,6 +47,35 @@ const ProfessorDashboard = () => {
     { id: "8", name: "Nathan Durand" },
   ];
 
+  // Données fictives pour les notes
+  const gradesData: GradeRecord[] = [
+    { id: "1", date: "2025-05-20", course: "Mathématiques", student: "Sophie Martin", class: "Terminale S", professor: "Prof. Dupont", grade: 16.5, coefficient: 2, type: "exam", comment: "Excellent travail" },
+    { id: "2", date: "2025-05-19", course: "Mathématiques", student: "Lucas Dubois", class: "Terminale S", professor: "Prof. Dupont", grade: 14.0, coefficient: 1, type: "homework" },
+    { id: "3", date: "2025-05-18", course: "Algèbre", student: "Emma Bernard", class: "Première S", professor: "Prof. Dupont", grade: 12.5, coefficient: 2, type: "quiz" },
+    { id: "4", date: "2025-05-17", course: "Géométrie", student: "Thomas Leroy", class: "Seconde A", professor: "Prof. Dupont", grade: 18.0, coefficient: 3, type: "project", comment: "Très bon projet" },
+  ];
+
+  const courses = [
+    { id: "1", name: "Mathématiques" },
+    { id: "2", name: "Algèbre" },
+    { id: "3", name: "Géométrie" }
+  ];
+
+  const handleGradeSubmit = (gradesData: any[]) => {
+    console.log("Nouvelles notes:", gradesData);
+    // Ici on ajouterait la logique pour sauvegarder les notes
+  };
+
+  const handleEditGrade = (grade: GradeRecord) => {
+    console.log("Modifier la note:", grade);
+    // Logique de modification
+  };
+
+  const handleDeleteGrade = (gradeId: string) => {
+    console.log("Supprimer la note:", gradeId);
+    // Logique de suppression
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header userRole="professor" userName="Prof. Dupont" />
@@ -56,6 +87,7 @@ const ProfessorDashboard = () => {
               <TabsList>
                 <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
                 <TabsTrigger value="record">Prise d'absences</TabsTrigger>
+                <TabsTrigger value="grades">Saisie des notes</TabsTrigger>
                 <TabsTrigger value="history">Historique</TabsTrigger>
                 <TabsTrigger value="courses">Mes cours</TabsTrigger>
               </TabsList>
@@ -88,7 +120,7 @@ const ProfessorDashboard = () => {
             </div>
             
             <TabsContent value="dashboard" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <DashboardCard
                   title="Absences dans mes cours"
                   value="28"
@@ -107,6 +139,13 @@ const ProfessorDashboard = () => {
                   title="Cours à venir aujourd'hui"
                   value="3"
                   description="Terminale S, Première S, Seconde A"
+                />
+                <DashboardCard
+                  title="Moyenne générale"
+                  value="14.8"
+                  description="Moyenne de mes cours"
+                  trend="up"
+                  trendValue="0.5 points par rapport au mois dernier"
                 />
               </div>
               
@@ -201,6 +240,15 @@ const ProfessorDashboard = () => {
               <div className="flex justify-end mt-4">
                 <Button>Enregistrer l'appel</Button>
               </div>
+            </TabsContent>
+            
+            <TabsContent value="grades" className="space-y-4">
+              <h2 className="text-xl font-bold mb-4">Saisie des notes</h2>
+              <GradeEntry 
+                students={students.map(s => ({ ...s, class: "Terminale S" }))}
+                courses={courses}
+                onSubmit={handleGradeSubmit}
+              />
             </TabsContent>
             
             <TabsContent value="history" className="space-y-4">

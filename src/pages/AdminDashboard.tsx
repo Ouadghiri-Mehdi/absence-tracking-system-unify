@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import DashboardCard from "@/components/DashboardCard";
 import AttendanceTable, { AttendanceRecord } from "@/components/AttendanceTable";
+import GradesTable, { GradeRecord } from "@/components/GradesTable";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,10 +12,12 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedClass, setSelectedClass] = useState("all");
   const [selectedPeriod, setSelectedPeriod] = useState("month");
+  const [selectedCourse, setSelectedCourse] = useState("all");
 
   const sidebarItems = [
     { title: "Tableau de bord", href: "/admin?tab=dashboard" },
     { title: "Gestion des absences", href: "/admin?tab=absences" },
+    { title: "Gestion des notes", href: "/admin?tab=grades" },
     { title: "Rapports", href: "/admin?tab=reports" },
     { title: "Paramètres", href: "/admin?tab=settings" },
   ];
@@ -32,6 +34,32 @@ const AdminDashboard = () => {
     { id: "8", date: "2025-05-15", course: "Mathématiques", student: "Nathan Durand", class: "Seconde B", status: "present", duration: 2 },
   ];
 
+  // Données fictives pour toutes les notes
+  const allGradesData: GradeRecord[] = [
+    { id: "1", date: "2025-05-20", course: "Mathématiques", student: "Sophie Martin", class: "Terminale S", professor: "Prof. Dupont", grade: 16.5, coefficient: 2, type: "exam", comment: "Excellent travail" },
+    { id: "2", date: "2025-05-19", course: "Mathématiques", student: "Lucas Dubois", class: "Terminale S", professor: "Prof. Dupont", grade: 14.0, coefficient: 1, type: "homework" },
+    { id: "3", date: "2025-05-18", course: "Français", student: "Emma Bernard", class: "Première L", professor: "Prof. Martin", grade: 12.5, coefficient: 2, type: "quiz" },
+    { id: "4", date: "2025-05-17", course: "Histoire", student: "Thomas Leroy", class: "Seconde A", professor: "Prof. Leroy", grade: 18.0, coefficient: 3, type: "project", comment: "Très bon projet" },
+    { id: "5", date: "2025-05-16", course: "Anglais", student: "Léa Moreau", class: "Première ES", professor: "Prof. Smith", grade: 15.5, coefficient: 2, type: "exam" },
+    { id: "6", date: "2025-05-15", course: "SVT", student: "Hugo Petit", class: "Terminale S", professor: "Prof. Dubois", grade: 13.0, coefficient: 1, type: "homework" },
+  ];
+
+  const filteredGrades = allGradesData.filter(grade => {
+    if (selectedClass !== "all" && !grade.class.toLowerCase().includes(selectedClass)) return false;
+    if (selectedCourse !== "all" && grade.course !== selectedCourse) return false;
+    return true;
+  });
+
+  const handleEditGrade = (grade: GradeRecord) => {
+    console.log("Modifier la note:", grade);
+    // Logique de modification par l'admin
+  };
+
+  const handleDeleteGrade = (gradeId: string) => {
+    console.log("Supprimer la note:", gradeId);
+    // Logique de suppression
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header userRole="admin" userName="Admin Principal" />
@@ -43,6 +71,7 @@ const AdminDashboard = () => {
               <TabsList>
                 <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
                 <TabsTrigger value="absences">Gestion des absences</TabsTrigger>
+                <TabsTrigger value="grades">Gestion des notes</TabsTrigger>
                 <TabsTrigger value="reports">Rapports</TabsTrigger>
                 <TabsTrigger value="settings">Paramètres</TabsTrigger>
               </TabsList>
@@ -57,6 +86,20 @@ const AdminDashboard = () => {
                     <SelectItem value="terminale">Terminale</SelectItem>
                     <SelectItem value="premiere">Première</SelectItem>
                     <SelectItem value="seconde">Seconde</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Toutes les matières" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les matières</SelectItem>
+                    <SelectItem value="Mathématiques">Mathématiques</SelectItem>
+                    <SelectItem value="Français">Français</SelectItem>
+                    <SelectItem value="Histoire">Histoire</SelectItem>
+                    <SelectItem value="Anglais">Anglais</SelectItem>
+                    <SelectItem value="SVT">SVT</SelectItem>
                   </SelectContent>
                 </Select>
                 
@@ -104,11 +147,34 @@ const AdminDashboard = () => {
                   trend="up"
                   trendValue="1.2% par rapport au mois dernier"
                 />
+                <DashboardCard
+                  title="Moyenne générale"
+                  value="14.2"
+                  description="Toutes matières confondues"
+                  trend="up"
+                  trendValue="0.3 points par rapport au mois dernier"
+                />
+                <DashboardCard
+                  title="Notes saisies"
+                  value="156"
+                  description="Ce mois-ci"
+                  trend="up"
+                  trendValue="23 notes de plus que le mois dernier"
+                />
               </div>
               
               <div className="mt-6">
                 <h2 className="text-xl font-bold mb-4">Dernières absences</h2>
                 <AttendanceTable data={attendanceData.slice(0, 5)} userRole="admin" />
+              </div>
+              <div className="mt-6">
+                <h2 className="text-xl font-bold mb-4">Dernières notes saisies</h2>
+                <GradesTable 
+                  data={allGradesData.slice(0, 5)} 
+                  userRole="admin"
+                  onEditGrade={handleEditGrade}
+                  onDeleteGrade={handleDeleteGrade}
+                />
               </div>
             </TabsContent>
             
@@ -118,6 +184,21 @@ const AdminDashboard = () => {
                 <Button>Nouvel enregistrement</Button>
               </div>
               <AttendanceTable data={attendanceData} userRole="admin" />
+            </TabsContent>
+            
+            <TabsContent value="grades" className="space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Gestion des notes</h2>
+                <div className="text-sm text-muted-foreground">
+                  {filteredGrades.length} note(s) trouvée(s)
+                </div>
+              </div>
+              <GradesTable 
+                data={filteredGrades} 
+                userRole="admin"
+                onEditGrade={handleEditGrade}
+                onDeleteGrade={handleDeleteGrade}
+              />
             </TabsContent>
             
             <TabsContent value="reports" className="space-y-4">
